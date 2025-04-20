@@ -7,38 +7,74 @@ from notion.crud import (
     get_my_classes,
     get_upcoming_classes,
     get_subscribers_for_class,
+    get_waiting_list,
     enroll_user
 )
 from config import _ as gettext
 import datetime
+
 
 async def navigate(call: types.CallbackQuery, callback_data: dict):
     user_id = call.from_user.id
     user_role = await get_user_role(user_id)
     path = callback_data.get("path", "")
 
-    # 1. My Classes
+    # 1. My Classes (enrolled and waiting)
     if path == "classes/my_classes":
         my_classes = await get_my_classes(user_id)
         kb = InlineKeyboardMarkup(row_width=1)
         for cls in my_classes:
-            label = f"{cls.date} {cls.time} – {cls.name}"
+            subs = await get_subscribers_for_class(cls.id)
+            waitlist = await get_waiting_list(cls.id)
+            is_enrolled = user_id in subs
+            is_waiting = user_id in waitlist
+
+            if is_enrolled:
+                icon = "✅"
+            elif is_waiting:
+                icon = "⏳"
+            else:
+                icon = "➕"
+
+            label = f"{icon} {cls.date} {cls.time} – {cls.name}"
             kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/my_classes/{cls.id}")))
         kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes")))
         await call.message.edit_text(gettext("my_classes_title"), reply_markup=kb)
         await call.answer()
         return
 
-    # 1b. Toggle unenroll from My Classes
+    # 1b. Toggle enroll/unenroll/unwaiting from My Classes
     if path.startswith("classes/my_classes/") and path.count("/") == 2:
         _, _, class_id = path.split("/")
-        success = await enroll_user(user_id, class_id)
-        text = gettext("unenroll_success") if not success else gettext("enroll_success")
-        await call.answer(text, show_alert=True)
+        result = await enroll_user(user_id, class_id)
+
+        if result == "unenrolled":
+            await call.answer(gettext("unenroll_success"), show_alert=True)
+        elif result == "enrolled":
+            await call.answer(gettext("enroll_success"), show_alert=True)
+        elif result == "unwaiting":
+            await call.answer(gettext("waiting_list_removed"), show_alert=True)
+        elif result == "waiting":
+            await call.answer(gettext("waiting_list_joined"), show_alert=True)
+        else:
+            await call.answer(gettext("unknown_error"), show_alert=True)
+
         my_classes = await get_my_classes(user_id)
         kb = InlineKeyboardMarkup(row_width=1)
         for cls in my_classes:
-            label = f"{cls.date} {cls.time} – {cls.name}"
+            subs = await get_subscribers_for_class(cls.id)
+            waitlist = await get_waiting_list(cls.id)
+            is_enrolled = user_id in subs
+            is_waiting = user_id in waitlist
+
+            if is_enrolled:
+                icon = "✅"
+            elif is_waiting:
+                icon = "⏳"
+            else:
+                icon = "➕"
+
+            label = f"{icon} {cls.date} {cls.time} – {cls.name}"
             kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/my_classes/{cls.id}")))
         kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes")))
         await call.message.edit_text(gettext("my_classes_title"), reply_markup=kb)
@@ -62,11 +98,23 @@ async def navigate(call: types.CallbackQuery, callback_data: dict):
         _, _, date_str = path.split("/")
         classes = await get_upcoming_classes(date_str)
         kb = InlineKeyboardMarkup(row_width=1)
+
         for cls in classes:
             subs = await get_subscribers_for_class(cls.id)
-            icon = "✅" if user_id in subs else "➕"
+            waitlist = await get_waiting_list(cls.id)
+            is_enrolled = user_id in subs
+            is_waiting = user_id in waitlist
+
+            if is_enrolled:
+                icon = "✅"
+            elif is_waiting:
+                icon = "⏳"
+            else:
+                icon = "➕"
+
             label = f"{icon} {cls.time} – {cls.name} ({len(subs)} subs)"
             kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/upcoming_classes/{date_str}/{cls.id}")))
+
         kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes/upcoming_classes")))
         await call.message.edit_text(gettext("classes_on_date").format(date=date_str), reply_markup=kb)
         await call.answer()
@@ -75,16 +123,38 @@ async def navigate(call: types.CallbackQuery, callback_data: dict):
     # 4. Toggle enrollment and re-render
     if path.startswith("classes/upcoming_classes/") and path.count("/") == 3:
         _, _, date_str, class_id = path.split("/")
-        success = await enroll_user(user_id, class_id)
-        text = gettext("enroll_success") if success else gettext("unenroll_success")
-        await call.answer(text, show_alert=True)
+        result = await enroll_user(user_id, class_id)
+
+        if result == "enrolled":
+            await call.answer(gettext("enroll_success"), show_alert=True)
+        elif result == "unenrolled":
+            await call.answer(gettext("unenroll_success"), show_alert=True)
+        elif result == "waiting":
+            await call.answer(gettext("waiting_list_joined"), show_alert=True)
+        elif result == "unwaiting":
+            await call.answer(gettext("waiting_list_removed"), show_alert=True)
+        else:
+            await call.answer(gettext("unknown_error"), show_alert=True)
+
         classes = await get_upcoming_classes(date_str)
         kb = InlineKeyboardMarkup(row_width=1)
+
         for cls in classes:
             subs = await get_subscribers_for_class(cls.id)
-            icon = "✅" if user_id in subs else "➕"
+            waitlist = await get_waiting_list(cls.id)
+            is_enrolled = user_id in subs
+            is_waiting = user_id in waitlist
+
+            if is_enrolled:
+                icon = "✅"
+            elif is_waiting:
+                icon = "⏳"
+            else:
+                icon = "➕"
+
             label = f"{icon} {cls.time} – {cls.name} ({len(subs)} subs)"
             kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/upcoming_classes/{date_str}/{cls.id}")))
+
         kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes/upcoming_classes")))
         await call.message.edit_text(gettext("classes_on_date").format(date=date_str), reply_markup=kb)
         return
@@ -111,6 +181,7 @@ async def navigate(call: types.CallbackQuery, callback_data: dict):
     except MessageNotModified:
         pass
     await call.answer()
+
 
 def register_navigation(dp: Dispatcher):
     dp.register_callback_query_handler(navigate, nav_cd.filter())

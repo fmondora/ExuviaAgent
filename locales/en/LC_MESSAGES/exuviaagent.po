@@ -105,3 +105,12 @@ msgstr "📍 Main Menu"
 
 msgid "back"
 msgstr "< Back"
+
+msgid "waiting_list_joined"
+msgstr "⏳ You’ve been added to the waiting list."
+
+msgid "waiting_list_removed"
+msgstr "You’ve been removed from the waiting list."
+
+msgid "unknown_error"
+msgstr "Something went wrong. Please try again."

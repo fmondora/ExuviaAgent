@@ -11,97 +11,106 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "sign_up_today"
-msgstr "🏋️ Iscriviti alla classe di oggi"
+msgstr "🏋️ Dai, iscriviti alla classe di oggi!"
 
 msgid "view_wod"
-msgstr "💪 Vedi il WOD di oggi"
+msgstr "💪 Scopri il tuo WOD di oggi!"
 
 msgid "classes"
-msgstr "📅 Classi"
+msgstr "📅 Le tue classi"
 
 msgid "view_calendar"
-msgstr "Visualizza Calendario"
+msgstr "Guarda il calendario"
 
 msgid "subscribe"
-msgstr "Iscrivi/Disiscrivi"
+msgstr "Iscriviti o disiscriviti"
 
 msgid "waiting_list"
 msgstr "Lista d'attesa"
 
 msgid "progress"
-msgstr "📈 Progressi"
+msgstr "📈 I tuoi progressi"
 
 msgid "view_maxes"
-msgstr "Visualizza Massimali"
+msgstr "Controlla i tuoi massimali"
 
 msgid "update_maxes"
-msgstr "Aggiungi/Aggiorna Massimali"
+msgstr "Aggiungi o aggiorna i massimali"
 
 msgid "wod_history"
-msgstr "Cronologia WOD"
+msgstr "La tua cronologia WOD"
 
 msgid "statistics"
-msgstr "Statistiche"
+msgstr "Le tue statistiche"
 
 msgid "profile"
-msgstr "⚙️ Profilo e Abbonamento"
+msgstr "⚙️ Il tuo profilo e abbonamento"
 
 msgid "view_profile"
-msgstr "Visualizza/Modifica Profilo"
+msgstr "Vedi o modifica il tuo profilo"
 
 msgid "subscription"
-msgstr "Stato Abbonamento"
+msgstr "Il tuo abbonamento"
 
 msgid "renew"
-msgstr "Rinnova Abbonamento"
+msgstr "Rinnova il tuo abbonamento"
 
 msgid "certificate"
-msgstr "Stato Certificato"
+msgstr "Il tuo certificato"
 
 msgid "upload_certificate"
-msgstr "Carica Certificato"
+msgstr "Carica il tuo certificato"
 
 msgid "settings"
-msgstr "🛠️ Impostazioni"
+msgstr "🛠️ Le tue impostazioni"
 
 msgid "reminders"
-msgstr "Promemoria"
+msgstr "I tuoi promemoria"
 
 msgid "language"
 msgstr "Lingua"
 
 msgid "community"
-msgstr "Community"
+msgstr "La tua community"
 
-msgid "my_classes"  
-msgstr "Le mie classi"
+msgid "my_classes"
+msgstr "Le tue classi"
 
 msgid "upcoming_classes"
-msgstr "Classi nei prossimi 7 giorni"
+msgstr "Classi dei prossimi 7 giorni"
 
 msgid "my_classes_title"
-msgstr "Le mie classi"
+msgstr "Le tue classi"
 
 msgid "upcoming_calendar_title"
-msgstr "Seleziona una data"
+msgstr "Scegli una data"
 
 msgid "classes_on_date"
 msgstr "Classi del {date}"
 
 msgid "enroll_success"
-msgstr "Iscrizione avvenuta con successo!"
+msgstr "Grande, sei iscrittə alla classe!"
 
 msgid "unenroll_success"
-msgstr "Disiscrizione avvenuta con successo!"
+msgstr "Ok, disiscrizione completata!"
 
 msgid "invalid_path"
-msgstr "Percorso non valido."
+msgstr "Ops, qualcosa non va. Torna indietro!"
 
 msgid "breadcrumb_prefix"
 msgstr "📍 {crumb}"
 
 msgid "main_menu_title"
-msgstr "📍 Menu Principale"
+msgstr "📍 Menu principale"
 
 msgid "back"
-msgstr "< Indietro"
+msgstr "< Torna indietro"
+
+msgid "waiting_list_joined"
+msgstr "⏳ Grande, sei nella lista d'attesa!"
+
+msgid "waiting_list_removed"
+msgstr "Ok, non sei più nella lista d'attesa."
+
+msgid "unknown_error"
+msgstr "Ops, qualcosa non ha funzionato. Prova di nuovo!"

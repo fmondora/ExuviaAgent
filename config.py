@@ -34,6 +34,9 @@ USER_TG_ID_FRANCESCO = int(os.getenv("USER_TG_ID_FRANCESCO", 1001))
 USER_TG_ID_LUCIA = int(os.getenv("USER_TG_ID_LUCIA", 1002))
 USER_TG_ID_MANUEL = int(os.getenv("USER_TG_ID_MANUEL", 1003))
 
+CLASS_MAX_CAPACITY = int(os.getenv("CLASS_MAX_CAPACITY", 9))
+
+
 # Initialize Telegram Bot
 bot = Bot(token=TELEGRAM_TOKEN, parse_mode='HTML')  # use HTML to avoid MarkdownV2 parsing issues
 
