@@ -1,0 +1,21 @@
+# variabili d'ambiente
+.env
+
+# cartelle ambiente virtuale
+venv/
+env/
+.venv/
+
+# bytecode Python
+__pycache__/
+*.py[cod]
+
+# directory di build
+build/
+dist/
+*.egg-info/
+
+# configurazioni editor/IDE
+.idea/
+.vscode/
+

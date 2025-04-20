@@ -1,0 +1,107 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: exuviaagent 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-20 00:00+0000\n"
+"PO-Revision-Date: 2025-04-20 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "sign_up_today"
+msgstr "🏋️ Sign up for today’s class"
+
+msgid "view_wod"
+msgstr "💪 View today’s WOD"
+
+msgid "classes"
+msgstr "📅 Classes"
+
+msgid "view_calendar"
+msgstr "View Calendar"
+
+msgid "subscribe"
+msgstr "Subscribe/Unsubscribe"
+
+msgid "waiting_list"
+msgstr "Waiting List"
+
+msgid "progress"
+msgstr "📈 Progress"
+
+msgid "view_maxes"
+msgstr "View Maxes"
+
+msgid "update_maxes"
+msgstr "Add/Update Maxes"
+
+msgid "wod_history"
+msgstr "WOD History"
+
+msgid "statistics"
+msgstr "Statistics"
+
+msgid "profile"
+msgstr "⚙️ Profile & Subscription"
+
+msgid "view_profile"
+msgstr "View/Edit Profile"
+
+msgid "subscription"
+msgstr "Subscription Status"
+
+msgid "renew"
+msgstr "Renew Subscription"
+
+msgid "certificate"
+msgstr "Certificate Status"
+
+msgid "upload_certificate"
+msgstr "Upload Certificate"
+
+msgid "settings"
+msgstr "🛠️ Settings"
+
+msgid "reminders"
+msgstr "Reminders"
+
+msgid "language"
+msgstr "Language"
+
+msgid "community"
+msgstr "Community"
+
+msgid "my_classes"
+msgstr "My Classes"
+
+msgid "upcoming_classes"
+msgstr "Upcoming Classes"
+
+msgid "my_classes_title"
+msgstr "My Classes"
+
+msgid "upcoming_calendar_title"
+msgstr "Select a date"
+
+msgid "classes_on_date"
+msgstr "Classes on {date}"
+
+msgid "enroll_success"
+msgstr "You have successfully enrolled!"
+
+msgid "unenroll_success"
+msgstr "You have successfully unenrolled!"
+
+msgid "invalid_path"
+msgstr "Invalid menu path."
+
+msgid "breadcrumb_prefix"
+msgstr "📍 {crumb}"
+
+msgid "main_menu_title"
+msgstr "📍 Main Menu"
+
+msgid "back"
+msgstr "< Back"

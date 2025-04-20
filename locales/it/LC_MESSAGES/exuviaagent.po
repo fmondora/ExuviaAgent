@@ -1,0 +1,107 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: exuviaagent 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-20 00:00+0000\n"
+"PO-Revision-Date: 2025-04-20 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Italiano\n"
+"Language: it\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "sign_up_today"
+msgstr "🏋️ Iscriviti alla classe di oggi"
+
+msgid "view_wod"
+msgstr "💪 Vedi il WOD di oggi"
+
+msgid "classes"
+msgstr "📅 Classi"
+
+msgid "view_calendar"
+msgstr "Visualizza Calendario"
+
+msgid "subscribe"
+msgstr "Iscrivi/Disiscrivi"
+
+msgid "waiting_list"
+msgstr "Lista d'attesa"
+
+msgid "progress"
+msgstr "📈 Progressi"
+
+msgid "view_maxes"
+msgstr "Visualizza Massimali"
+
+msgid "update_maxes"
+msgstr "Aggiungi/Aggiorna Massimali"
+
+msgid "wod_history"
+msgstr "Cronologia WOD"
+
+msgid "statistics"
+msgstr "Statistiche"
+
+msgid "profile"
+msgstr "⚙️ Profilo e Abbonamento"
+
+msgid "view_profile"
+msgstr "Visualizza/Modifica Profilo"
+
+msgid "subscription"
+msgstr "Stato Abbonamento"
+
+msgid "renew"
+msgstr "Rinnova Abbonamento"
+
+msgid "certificate"
+msgstr "Stato Certificato"
+
+msgid "upload_certificate"
+msgstr "Carica Certificato"
+
+msgid "settings"
+msgstr "🛠️ Impostazioni"
+
+msgid "reminders"
+msgstr "Promemoria"
+
+msgid "language"
+msgstr "Lingua"
+
+msgid "community"
+msgstr "Community"
+
+msgid "my_classes"  
+msgstr "Le mie classi"
+
+msgid "upcoming_classes"
+msgstr "Classi nei prossimi 7 giorni"
+
+msgid "my_classes_title"
+msgstr "Le mie classi"
+
+msgid "upcoming_calendar_title"
+msgstr "Seleziona una data"
+
+msgid "classes_on_date"
+msgstr "Classi del {date}"
+
+msgid "enroll_success"
+msgstr "Iscrizione avvenuta con successo!"
+
+msgid "unenroll_success"
+msgstr "Disiscrizione avvenuta con successo!"
+
+msgid "invalid_path"
+msgstr "Percorso non valido."
+
+msgid "breadcrumb_prefix"
+msgstr "📍 {crumb}"
+
+msgid "main_menu_title"
+msgstr "📍 Menu Principale"
+
+msgid "back"
+msgstr "< Indietro"
