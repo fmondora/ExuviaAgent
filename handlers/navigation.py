@@ -1,187 +1,160 @@
 from aiogram import types, Dispatcher
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.exceptions import MessageNotModified
+from aiogram.utils.callback_data import CallbackData
 from keyboards.menus import nav_cd, MENU_STRUCTURE, build_menu
 from notion.crud import (
     get_user_role,
     get_my_classes,
     get_upcoming_classes,
-    get_subscribers_for_class,
-    get_waiting_list,
     enroll_user
 )
 from config import _ as gettext
 import datetime
 
+# ----------------------------------------------------------------
+# CallbackData per il flusso “classi” (più compatto dell'UUID)
+classes_cd = CallbackData('cs', 'action', 'date', 'idx')
+# ----------------------------------------------------------------
 
-async def navigate(call: types.CallbackQuery, callback_data: dict):
+async def handle_classes(call: types.CallbackQuery, callback_data: dict):
     user_id = call.from_user.id
-    user_role = await get_user_role(user_id)
-    path = callback_data.get("path", "")
+    action = callback_data['action']
+    date = callback_data.get('date', '')
+    idx = int(callback_data.get('idx', 0))
 
-    # 1. My Classes (enrolled and waiting)
-    if path == "classes/my_classes":
+    # --- 1) My Classes ---
+    if action == 'my':
         my_classes = await get_my_classes(user_id)
         kb = InlineKeyboardMarkup(row_width=1)
-        for cls in my_classes:
-            subs = await get_subscribers_for_class(cls.id)
-            waitlist = await get_waiting_list(cls.id)
-            is_enrolled = user_id in subs
-            is_waiting = user_id in waitlist
-
-            if is_enrolled:
+        for i, cls in enumerate(my_classes):
+            # icone basate su subscribers_count e waiting_count
+            if cls.subscribers_count < cls.capacity:
                 icon = "✅"
-            elif is_waiting:
+            elif cls.waiting_count > 0:
                 icon = "⏳"
             else:
                 icon = "➕"
-
             label = f"{icon} {cls.date} {cls.time} – {cls.name}"
-            kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/my_classes/{cls.id}")))
-        kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes")))
+            kb.add(InlineKeyboardButton(
+                label,
+                callback_data=classes_cd.new(action='toggle_my', date='', idx=i)
+            ))
+        kb.add(InlineKeyboardButton(
+            gettext("back"),
+            callback_data=nav_cd.new(path="classes")
+        ))
         await call.message.edit_text(gettext("my_classes_title"), reply_markup=kb)
         await call.answer()
         return
 
-    # 1b. Toggle enroll/unenroll/unwaiting from My Classes
-    if path.startswith("classes/my_classes/") and path.count("/") == 2:
-        _, _, class_id = path.split("/")
-        result = await enroll_user(user_id, class_id)
-
-        if result == "unenrolled":
-            await call.answer(gettext("unenroll_success"), show_alert=True)
-        elif result == "enrolled":
-            await call.answer(gettext("enroll_success"), show_alert=True)
-        elif result == "unwaiting":
-            await call.answer(gettext("waiting_list_removed"), show_alert=True)
-        elif result == "waiting":
-            await call.answer(gettext("waiting_list_joined"), show_alert=True)
-        else:
-            await call.answer(gettext("unknown_error"), show_alert=True)
-
+    # --- 1b) Toggle enroll/unenroll in My Classes ---
+    if action == 'toggle_my':
         my_classes = await get_my_classes(user_id)
-        kb = InlineKeyboardMarkup(row_width=1)
-        for cls in my_classes:
-            subs = await get_subscribers_for_class(cls.id)
-            waitlist = await get_waiting_list(cls.id)
-            is_enrolled = user_id in subs
-            is_waiting = user_id in waitlist
+        cls = my_classes[idx]
+        result = await enroll_user(user_id, cls.id)
+        await call.answer(gettext(f"{result}_success"), show_alert=True)
+        # ri-mostra la lista aggiornata
+        return await handle_classes(call, {'action': 'my', 'date': '', 'idx': 0})
 
-            if is_enrolled:
-                icon = "✅"
-            elif is_waiting:
-                icon = "⏳"
-            else:
-                icon = "➕"
-
-            label = f"{icon} {cls.date} {cls.time} – {cls.name}"
-            kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/my_classes/{cls.id}")))
-        kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes")))
-        await call.message.edit_text(gettext("my_classes_title"), reply_markup=kb)
-        return
-
-    # 2. Upcoming Classes – calendar
-    if path == "classes/upcoming_classes":
+    # --- 2) Upcoming Classes: calendar view ---
+    if action == 'calendar':
         kb = InlineKeyboardMarkup(row_width=4)
         today = datetime.date.today()
         for i in range(7):
             d = today + datetime.timedelta(days=i)
-            label = d.strftime("%a %d/%m")
-            kb.insert(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/upcoming_classes/{d.isoformat()}")))
-        kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes")))
+            kb.insert(InlineKeyboardButton(
+                d.strftime("%a %d/%m"),
+                callback_data=classes_cd.new(action='day', date=d.isoformat(), idx=i)
+            ))
+        kb.add(InlineKeyboardButton(
+            gettext("back"),
+            callback_data=nav_cd.new(path="classes")
+        ))
         await call.message.edit_text(gettext("upcoming_calendar_title"), reply_markup=kb)
         await call.answer()
         return
 
-    # 3. List of classes for a date
-    if path.startswith("classes/upcoming_classes/") and path.count("/") == 2:
-        _, _, date_str = path.split("/")
-        classes = await get_upcoming_classes(date_str)
+    # --- 3) Lista delle classi di un giorno ---
+    if action == 'day':
+        classes = await get_upcoming_classes(date)
         kb = InlineKeyboardMarkup(row_width=1)
-
-        for cls in classes:
-            subs = await get_subscribers_for_class(cls.id)
-            waitlist = await get_waiting_list(cls.id)
-            is_enrolled = user_id in subs
-            is_waiting = user_id in waitlist
-
-            if is_enrolled:
+        for i, cls in enumerate(classes):
+            if cls.subscribers_count < cls.capacity:
                 icon = "✅"
-            elif is_waiting:
+            elif cls.waiting_count > 0:
                 icon = "⏳"
             else:
                 icon = "➕"
-
-            label = f"{icon} {cls.time} – {cls.name} ({len(subs)} subs)"
-            kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/upcoming_classes/{date_str}/{cls.id}")))
-
-        kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes/upcoming_classes")))
-        await call.message.edit_text(gettext("classes_on_date").format(date=date_str), reply_markup=kb)
+            label = f"{icon} {cls.time} – {cls.name} ({cls.subscribers_count} subs)"
+            kb.add(InlineKeyboardButton(
+                label,
+                callback_data=classes_cd.new(action='toggle_up', date=date, idx=i)
+            ))
+        kb.add(InlineKeyboardButton(
+            gettext("back"),
+            callback_data=classes_cd.new(action='calendar', date='', idx=0)
+        ))
+        await call.message.edit_text(gettext("classes_on_date").format(date=date), reply_markup=kb)
         await call.answer()
         return
 
-    # 4. Toggle enrollment and re-render
-    if path.startswith("classes/upcoming_classes/") and path.count("/") == 3:
-        _, _, date_str, class_id = path.split("/")
-        result = await enroll_user(user_id, class_id)
+    # --- 4) Toggle enroll/unenroll/waiting in Upcoming ---
+    if action == 'toggle_up':
+        classes = await get_upcoming_classes(date)
+        cls = classes[idx]
+        result = await enroll_user(user_id, cls.id)
+        await call.answer(gettext(f"{result}_success"), show_alert=True)
+        # ri-mostra la lista del giorno aggiornato
+        return await handle_classes(call, {'action': 'day', 'date': date, 'idx': idx})
 
-        if result == "enrolled":
-            await call.answer(gettext("enroll_success"), show_alert=True)
-        elif result == "unenrolled":
-            await call.answer(gettext("unenroll_success"), show_alert=True)
-        elif result == "waiting":
-            await call.answer(gettext("waiting_list_joined"), show_alert=True)
-        elif result == "unwaiting":
-            await call.answer(gettext("waiting_list_removed"), show_alert=True)
-        else:
-            await call.answer(gettext("unknown_error"), show_alert=True)
+    # fallback sul callback delle classi (non dovrebbe mai succedere)
+    await call.answer()
 
-        classes = await get_upcoming_classes(date_str)
+async def navigate_menu(call: types.CallbackQuery, callback_data: dict):
+    user_id = call.from_user.id
+    user_role = await get_user_role(user_id)
+    path = callback_data.get("path", "")
+
+    # override per la sezione “Classes”
+    if path == "classes":
         kb = InlineKeyboardMarkup(row_width=1)
-
-        for cls in classes:
-            subs = await get_subscribers_for_class(cls.id)
-            waitlist = await get_waiting_list(cls.id)
-            is_enrolled = user_id in subs
-            is_waiting = user_id in waitlist
-
-            if is_enrolled:
-                icon = "✅"
-            elif is_waiting:
-                icon = "⏳"
-            else:
-                icon = "➕"
-
-            label = f"{icon} {cls.time} – {cls.name} ({len(subs)} subs)"
-            kb.add(InlineKeyboardButton(label, callback_data=nav_cd.new(path=f"classes/upcoming_classes/{date_str}/{cls.id}")))
-
-        kb.add(InlineKeyboardButton(gettext("back"), callback_data=nav_cd.new(path="classes/upcoming_classes")))
-        await call.message.edit_text(gettext("classes_on_date").format(date=date_str), reply_markup=kb)
+        # Mostra “My Classes” solo a chi ha ruolo PREMIUM o superiore
+        if user_role in {Role.PREMIUM, Role.COACH, Role.ADMIN}:
+            kb.add(InlineKeyboardButton(
+                gettext("my_classes_title"),
+                callback_data=classes_cd.new(action='my', date='', idx=0)
+            ))
+        # Sempre disponibile: Upcoming Classes
+        kb.add(InlineKeyboardButton(
+            gettext("upcoming_calendar_title"),
+            callback_data=classes_cd.new(action='calendar', date='', idx=0)
+        ))
+        kb.add(InlineKeyboardButton(
+            gettext("back"),
+            callback_data=nav_cd.new(path="")
+        ))
+        await call.message.edit_text(gettext("classes_title"), reply_markup=kb)
+        await call.answer()
         return
 
-    # 5. Fallback navigation
+    # navigazione generica
     node_list = MENU_STRUCTURE
     if path:
         for segment in path.split("/"):
-            try:
-                node = next(item for item in node_list if item["key"] == segment)
-            except StopIteration:
-                await call.answer(gettext("invalid_path"), show_alert=True)
-                node_list = MENU_STRUCTURE
-                path = ""
-                break
-            node_list = node.get("children", [])
+            node_list = next(item for item in node_list if item["key"] == segment)["children"]
 
     kb = build_menu(node_list, user_role=user_role, path=path)
-    breadcrumb_parts = path.split("/")
-    breadcrumb_key = breadcrumb_parts[-1] if breadcrumb_parts else "main_menu_title"
-    breadcrumb_text = gettext("breadcrumb_prefix").format(crumb=gettext(breadcrumb_key))
+    crumb_key = path.split("/")[-1] if path else "main_menu_title"
+    breadcrumb = gettext("breadcrumb_prefix").format(crumb=gettext(crumb_key))
     try:
-        await call.message.edit_text(breadcrumb_text, reply_markup=kb)
+        await call.message.edit_text(breadcrumb, reply_markup=kb)
     except MessageNotModified:
         pass
     await call.answer()
 
-
 def register_navigation(dp: Dispatcher):
-    dp.register_callback_query_handler(navigate, nav_cd.filter())
+    # Il flusso “classi” ha priorità
+    dp.register_callback_query_handler(handle_classes, classes_cd.filter())
+    # Poi la navigazione generica
+    dp.register_callback_query_handler(navigate_menu, nav_cd.filter())

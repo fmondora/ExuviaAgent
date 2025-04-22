@@ -26,8 +26,10 @@ logger.info(f"Running in {APP_ENV} mode")
 # Required environment variables
 TELEGRAM_TOKEN    = os.getenv('TELEGRAM_TOKEN')
 NOTION_TOKEN      = os.getenv('NOTION_TOKEN')
-NOTION_DB_USERS   = os.getenv('NOTION_DB_USERS_ID')
-NOTION_DB_CLASSES = os.getenv('NOTION_DB_CLASSES_ID')
+NOTION_DB_USERS   = os.getenv('NOTION_DB_USERS')
+NOTION_DB_CLASSES = os.getenv('NOTION_DB_CLASSES')
+
+logger.info("Notion token:"+NOTION_TOKEN)
 
 #Mock users
 USER_TG_ID_FRANCESCO = int(os.getenv("USER_TG_ID_FRANCESCO", 1001))
